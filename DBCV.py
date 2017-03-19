@@ -29,7 +29,6 @@ def _mutual_reachability_dist(point_i, point_j, neighbors_i,
     core_dist_i = _core_dist(point_i, neighbors_i, dist_function)
     core_dist_j = _core_dist(point_j, neighbors_j, dist_function)
     dist = dist_function(point_i, point_j)
-    print(core_dist_i, core_dist_j, dist)
     return np.max([core_dist_i, core_dist_j, dist])
     
 def _mutual_reach_dist_graph():
@@ -44,8 +43,11 @@ def _mutual_reach_dist_MST(dist_tree):
     mutual reach distance complete graph
     """
     return minimum_spanning_tree(dist_tree).toarray()
-
-
-X = np.random.rand(3,3)
-b = minimum_spanning_tree(X)
-b.toarray()
+    
+def _cluster_density_sparseness(MST, labels, cluster):
+    """
+    Computes the cluster density sparseness
+    """
+    indices = np.where(labels == cluster)[0]
+    cluster_MST = MST[indices][:,indices]]
+    return np.min(cluster_MST)
