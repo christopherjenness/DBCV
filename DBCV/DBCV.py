@@ -52,7 +52,8 @@ def _core_dist(point, neighbors, dist_function):
 
     numerator = 0
     for row in neighbors:
-        numerator += (1/dist_function(point, row))**n_features
+        if not np.array_equal(point, row):
+            numerator += (1/dist_function(point, row))**n_features
     core_dist = (numerator / (n_neighbors)) ** (1/n_features)
     return core_dist
 
@@ -101,8 +102,11 @@ def _mutual_reach_dist_graph(X, labels, dist_function):
 
     """
     n_samples = np.shape(X)[0]
-    graph = np.ones((n_samples, n_samples))
+    graph = []
+    counter = 0
     for row in range(n_samples):
+        print(counter)
+        graph_row = []
         for col in range(n_samples):
             point_i = X[row]
             point_j = X[col]
@@ -110,9 +114,13 @@ def _mutual_reach_dist_graph(X, labels, dist_function):
             class_j = labels[col]
             members_i = _get_label_members(X, labels, class_i)
             members_j = _get_label_members(X, labels, class_j)
-            graph[row, col] = _mutual_reachability_dist(point_i, point_j,
+            dist = _mutual_reachability_dist(point_i, point_j,
                                                         members_i, members_j,
                                                         dist_function)
+            graph_row.append(dist)
+        counter += 1
+        graph.append(graph_row)
+    graph = np.array(graph)
     return graph
 
 def _mutual_reach_dist_MST(dist_tree):
@@ -184,7 +192,7 @@ def _cluster_validity_index(MST, labels, cluster):
     Returns: cluster_validity (float)
         value corresponding to the validity of cluster assignments
     """
-    min_density_separation = np.inf
+    min_density_separation = -np.inf
     for cluster_j in np.unique(labels):
         if cluster_j != cluster:
             cluster_density_separation = _cluster_density_separation(MST,
@@ -237,3 +245,41 @@ def _get_label_members(X, labels, cluster):
     indices = np.where(labels == cluster)[0]
     members = X[indices]
     return members
+    
+######################
+# Begin Scratch work #
+######################
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from scipy.spatial.distance import euclidean
+from sklearn import datasets
+from sklearn.cluster import KMeans
+import hdbscan
+
+n_samples=70
+noisy_moons = datasets.make_moons(n_samples=n_samples, noise=.01)
+X = noisy_moons[0]
+
+kmeans =  KMeans(n_clusters=2)
+kmeans_labels = kmeans.fit_predict(X)
+
+hdbscanner = hdbscan.HDBSCAN()
+hdbscan_labels = hdbscanner.fit_predict(X)
+plt.scatter(X[:,0], X[:,1], c=hdbscan_labels)
+
+a = DBCV(X, kmeans_labels, dist_function=euclidean)
+b = DBCV(X, hdbscan_labels, dist_function=euclidean)
+
+plt.scatter(X[:,0], X[:,1], c=kmeans_labels)
+
+
+
+
+
+
+
+
+
+
