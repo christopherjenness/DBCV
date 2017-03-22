@@ -245,14 +245,3 @@ def _get_label_members(X, labels, cluster):
     indices = np.where(labels == cluster)[0]
     members = X[indices]
     return members
-
-
-
-
-
-
-
-
-
-
-
