@@ -27,7 +27,9 @@ def DBCV(X, labels, dist_function=euclidean):
         score in range[-1, 1] indicating validity of clustering assignments
     """
     graph = _mutual_reach_dist_graph(X, labels, dist_function)
+    #return graph
     mst = _mutual_reach_dist_MST(graph)
+    #return (graph, mst)
     cluster_validity = _clustering_validity_index(mst, labels)
     return cluster_validity
 
@@ -54,7 +56,7 @@ def _core_dist(point, neighbors, dist_function):
     for row in neighbors:
         if not np.array_equal(point, row):
             numerator += (1/dist_function(point, row))**n_features
-    core_dist = (numerator / (n_neighbors)) ** (1/n_features)
+    core_dist = (numerator / (n_neighbors)) ** (-1/n_features)
     return core_dist
 
 def _mutual_reachability_dist(point_i, point_j, neighbors_i,
@@ -136,7 +138,8 @@ def _mutual_reach_dist_MST(dist_tree):
         minimum spanning tree of all pair-wise mutual reachability
             distances between points.
     """
-    return minimum_spanning_tree(dist_tree).toarray()
+    mst = minimum_spanning_tree(dist_tree).toarray()
+    return mst + np.transpose(mst)
 
 def _cluster_density_sparseness(MST, labels, cluster):
     """
@@ -155,6 +158,7 @@ def _cluster_density_sparseness(MST, labels, cluster):
     indices = np.where(labels == cluster)[0]
     cluster_MST = MST[indices][:, indices]
     cluster_density_sparseness = np.max(cluster_MST)
+    print(cluster, cluster_density_sparseness)
     return cluster_density_sparseness
 
 def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
@@ -177,6 +181,7 @@ def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
     shortest_paths = csgraph.dijkstra(MST, indices=indices_i)
     relevant_paths = shortest_paths[:, indices_j]
     density_separation = np.min(relevant_paths)
+    print(cluster_i, cluster_j, density_separation)
     return density_separation
 
 def _cluster_validity_index(MST, labels, cluster):
@@ -205,6 +210,7 @@ def _cluster_validity_index(MST, labels, cluster):
     numerator = min_density_separation - cluster_density_sparseness
     denominator = np.max([min_density_separation, cluster_density_sparseness])
     cluster_validity = numerator / denominator
+    print('*', cluster, cluster_validity)
     return cluster_validity
 
 def _clustering_validity_index(MST, labels):
@@ -245,3 +251,5 @@ def _get_label_members(X, labels, cluster):
     indices = np.where(labels == cluster)[0]
     members = X[indices]
     return members
+
+
