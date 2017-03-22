@@ -192,14 +192,14 @@ def _cluster_validity_index(MST, labels, cluster):
     Returns: cluster_validity (float)
         value corresponding to the validity of cluster assignments
     """
-    min_density_separation = -np.inf
+    min_density_separation = np.inf
     for cluster_j in np.unique(labels):
         if cluster_j != cluster:
             cluster_density_separation = _cluster_density_separation(MST,
                                                                      labels,
                                                                      cluster,
                                                                      cluster_j)
-            if cluster_density_separation > min_density_separation:
+            if cluster_density_separation < min_density_separation:
                 min_density_separation = cluster_density_separation
     cluster_density_sparseness = _cluster_density_sparseness(MST, labels, cluster)
     numerator = min_density_separation - cluster_density_sparseness
@@ -245,34 +245,7 @@ def _get_label_members(X, labels, cluster):
     indices = np.where(labels == cluster)[0]
     members = X[indices]
     return members
-    
-######################
-# Begin Scratch work #
-######################
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-from scipy.spatial.distance import euclidean
-from sklearn import datasets
-from sklearn.cluster import KMeans
-import hdbscan
-
-n_samples=70
-noisy_moons = datasets.make_moons(n_samples=n_samples, noise=.01)
-X = noisy_moons[0]
-
-kmeans =  KMeans(n_clusters=2)
-kmeans_labels = kmeans.fit_predict(X)
-
-hdbscanner = hdbscan.HDBSCAN()
-hdbscan_labels = hdbscanner.fit_predict(X)
-plt.scatter(X[:,0], X[:,1], c=hdbscan_labels)
-
-a = DBCV(X, kmeans_labels, dist_function=euclidean)
-b = DBCV(X, hdbscan_labels, dist_function=euclidean)
-
-plt.scatter(X[:,0], X[:,1], c=kmeans_labels)
 
 
 
