@@ -107,7 +107,6 @@ def _mutual_reach_dist_graph(X, labels, dist_function):
     graph = []
     counter = 0
     for row in range(n_samples):
-        print(counter)
         graph_row = []
         for col in range(n_samples):
             point_i = X[row]
@@ -158,7 +157,6 @@ def _cluster_density_sparseness(MST, labels, cluster):
     indices = np.where(labels == cluster)[0]
     cluster_MST = MST[indices][:, indices]
     cluster_density_sparseness = np.max(cluster_MST)
-    print(cluster, cluster_density_sparseness)
     return cluster_density_sparseness
 
 def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
@@ -181,7 +179,6 @@ def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
     shortest_paths = csgraph.dijkstra(MST, indices=indices_i)
     relevant_paths = shortest_paths[:, indices_j]
     density_separation = np.min(relevant_paths)
-    print(cluster_i, cluster_j, density_separation)
     return density_separation
 
 def _cluster_validity_index(MST, labels, cluster):
@@ -251,5 +248,3 @@ def _get_label_members(X, labels, cluster):
     indices = np.where(labels == cluster)[0]
     members = X[indices]
     return members
-
-
