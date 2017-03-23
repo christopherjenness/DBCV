@@ -34,6 +34,8 @@ plt.scatter(X[:,0], X[:,1])
 plt.show()
 ```
 
+![moons](plots/moons.png)
+
 What happens when we try K-means clustering on these non-globular clusters?
 
 ```python
@@ -45,6 +47,8 @@ plt.scatter(X[:,0], X[:,1], c=kmeans_labels)
 plt.show()
 ```
 
+![kmeans](plots/kmeans.png)
+
 ...Not so great.  What about [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan), a density based clustering method?
 
 ```python
@@ -54,6 +58,8 @@ hdbscanner = hdbscan.HDBSCAN()
 hdbscan_labels = hdbscanner.fit_predict(X)
 plt.scatter(X[:,0], X[:,1], c=hdbscan_labels)
 ```
+
+![hdbscan](plots/hdbscan.png)
 
 That's pretty good.  To assess the quality of clustering, using Density-Based Clustering Validation, we call `DBCV`
 
