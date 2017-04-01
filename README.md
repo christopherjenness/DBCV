@@ -64,6 +64,8 @@ plt.scatter(X[:,0], X[:,1], c=hdbscan_labels)
 That's pretty good.  To assess the quality of clustering, using Density-Based Clustering Validation, we call `DBCV`
 
 ```python
+from scipy.spatial.distance import euclidean
+
 kmeans_score = DBCV(X, kmeans_labels, dist_function=euclidean)
 hdbscan_score = DBCV(X, hdbscan_labels, dist_function=euclidean)
 print(kmeans_score, hdbscan_score)
