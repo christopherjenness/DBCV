@@ -12,6 +12,7 @@ from scipy.spatial.distance import euclidean
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse import csgraph
 
+
 def DBCV(X, labels, dist_function=euclidean):
     """
     Density Based clustering validation
@@ -27,11 +28,10 @@ def DBCV(X, labels, dist_function=euclidean):
         score in range[-1, 1] indicating validity of clustering assignments
     """
     graph = _mutual_reach_dist_graph(X, labels, dist_function)
-    #return graph
     mst = _mutual_reach_dist_MST(graph)
-    #return (graph, mst)
     cluster_validity = _clustering_validity_index(mst, labels)
     return cluster_validity
+
 
 def _core_dist(point, neighbors, dist_function):
     """
@@ -59,6 +59,7 @@ def _core_dist(point, neighbors, dist_function):
     core_dist = (numerator / (n_neighbors)) ** (-1/n_features)
     return core_dist
 
+
 def _mutual_reachability_dist(point_i, point_j, neighbors_i,
                               neighbors_j, dist_function):
     """.
@@ -69,9 +70,9 @@ def _mutual_reachability_dist(point_i, point_j, neighbors_i,
             point i to compare to point j
         point_j (np.array): array of dimensions (n_features,)
             point i to compare to point i
-        neighbors_i (np.ndarray): array of dimensions (n_neighbors, n_features):
+        neighbors_i (np.ndarray): array of dims (n_neighbors, n_features):
             array of all other points in object class of point i
-        neighbors_j (np.ndarray): array of dimensions (n_neighbors, n_features):
+        neighbors_j (np.ndarray): array of dims (n_neighbors, n_features):
             array of all other points in object class of point j
         dist_dunction (func): function to determine distance between objects
             func args must be [np.array, np.array] where each array is a point
@@ -85,6 +86,7 @@ def _mutual_reachability_dist(point_i, point_j, neighbors_i,
     dist = dist_function(point_i, point_j)
     mutual_reachability = np.max([core_dist_i, core_dist_j, dist])
     return mutual_reachability
+
 
 def _mutual_reach_dist_graph(X, labels, dist_function):
     """
@@ -116,13 +118,14 @@ def _mutual_reach_dist_graph(X, labels, dist_function):
             members_i = _get_label_members(X, labels, class_i)
             members_j = _get_label_members(X, labels, class_j)
             dist = _mutual_reachability_dist(point_i, point_j,
-                                                        members_i, members_j,
-                                                        dist_function)
+                                             members_i, members_j,
+                                             dist_function)
             graph_row.append(dist)
         counter += 1
         graph.append(graph_row)
     graph = np.array(graph)
     return graph
+
 
 def _mutual_reach_dist_MST(dist_tree):
     """
@@ -130,7 +133,8 @@ def _mutual_reach_dist_MST(dist_tree):
 
     Args:
         dist_tree (np.ndarray): array of dimensions (n_samples, n_samples)
-            Graph of all pair-wise mutual reachability distances between points.
+            Graph of all pair-wise mutual reachability distances
+            between points.
 
     Returns: minimum_spanning_tree (np.ndarray)
         array of dimensions (n_samples, n_samples)
@@ -139,6 +143,7 @@ def _mutual_reach_dist_MST(dist_tree):
     """
     mst = minimum_spanning_tree(dist_tree).toarray()
     return mst + np.transpose(mst)
+
 
 def _cluster_density_sparseness(MST, labels, cluster):
     """
@@ -158,6 +163,7 @@ def _cluster_density_sparseness(MST, labels, cluster):
     cluster_MST = MST[indices][:, indices]
     cluster_density_sparseness = np.max(cluster_MST)
     return cluster_density_sparseness
+
 
 def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
     """
@@ -181,6 +187,7 @@ def _cluster_density_separation(MST, labels, cluster_i, cluster_j):
     density_separation = np.min(relevant_paths)
     return density_separation
 
+
 def _cluster_validity_index(MST, labels, cluster):
     """
     Computes the validity of a cluster (validity of assignmnets)
@@ -203,12 +210,14 @@ def _cluster_validity_index(MST, labels, cluster):
                                                                      cluster_j)
             if cluster_density_separation < min_density_separation:
                 min_density_separation = cluster_density_separation
-    cluster_density_sparseness = _cluster_density_sparseness(MST, labels, cluster)
+    cluster_density_sparseness = _cluster_density_sparseness(MST,
+                                                             labels,
+                                                             cluster)
     numerator = min_density_separation - cluster_density_sparseness
     denominator = np.max([min_density_separation, cluster_density_sparseness])
     cluster_validity = numerator / denominator
-    print('*', cluster, cluster_validity)
     return cluster_validity
+
 
 def _clustering_validity_index(MST, labels):
     """
@@ -230,6 +239,7 @@ def _clustering_validity_index(MST, labels):
         cluster_validity = _cluster_validity_index(MST, labels, label)
         validity_index += fraction * cluster_validity
     return validity_index
+
 
 def _get_label_members(X, labels, cluster):
     """

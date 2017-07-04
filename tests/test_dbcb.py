@@ -44,7 +44,7 @@ def test__mutual_reachability_dist(data):
     point_4 = data[46]
     dist_2 = DBCV._mutual_reachability_dist(point_3, point_4, data, data,
                                             euclidean)
-    assert abs(dist_2 - target) < 0.001  
+    assert abs(dist_2 - target) < 0.001
 
 
 def test__mutual_reach_dist_graph(data):
