@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.6"
+# command to install dependencies
+install:
+    - pip install -r requirements.txt
+    - pip install coveralls
+    - pip install pytest-cov
+# command to run tests
+script: pytest --cov=.
+after_success:
+    - coveralls
