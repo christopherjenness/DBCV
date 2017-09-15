@@ -5,6 +5,8 @@ Python implementation of Density-Based Clustering Validation
 
 Moulavi, Davoud, et al. "Density-based clustering validation." Proceedings of the 2014 SIAM International Conference on Data Mining. Society for Industrial and Applied Mathematics, 2014.
 
+[PDF](http://epubs.siam.org/doi/pdf/10.1137/1.9781611973440.96)
+
 ## What is DBCV
 
 How do you validate clustering assignmnets from unsupervised learning algorithms?  A common method is the [Silhoette Method](https://en.wikipedia.org/wiki/Silhouette_(clustering)), which provides an objective score between -1 and 1 on the quality of clustering.  The silhouette value measures how well an object is classified in its own cluster instead of neighboring clusters.  The silhouette (and most other popular methods) work very well on globular clusters, but can fail on non-glubular clusters such as:
