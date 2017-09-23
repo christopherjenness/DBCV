@@ -13,7 +13,7 @@ How do you validate clustering assignmnets from unsupervised learning algorithms
 
 ![non-globular](http://hdbscan.readthedocs.io/en/latest/_images/advanced_hdbscan_5_1.png)
 
-Here, we implement DBCV which can validate clustering assignments on non-globular, arbitrarily shaped clusters (such as the example above).  In essence, DBVC computes two values:
+Here, we implement DBCV which can validate clustering assignments on non-globular, arbitrarily shaped clusters (such as the example above).  In essence, DBCV computes two values:
 
 * The density **within** a cluster
 * The density **between** clusters
