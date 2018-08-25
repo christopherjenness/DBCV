@@ -52,7 +52,6 @@ def _core_dist(point, neighbors, dist_function):
     n_features = np.shape(point)[0]
     n_neighbors = np.shape(neighbors)[1]
 
-    numerator = 0
     distance_vector = cdist(point.reshape(1, -1), neighbors)
     distance_vector = distance_vector[distance_vector != 0]
     numerator = ((1/distance_vector)**n_features).sum()
