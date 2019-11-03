@@ -50,7 +50,7 @@ def _core_dist(point, neighbors, dist_function):
         inverse density of point
     """
     n_features = np.shape(point)[0]
-    n_neighbors = np.shape(neighbors)[1]
+    n_neighbors = np.shape(neighbors)[0]
 
     distance_vector = cdist(point.reshape(1, -1), neighbors)
     distance_vector = distance_vector[distance_vector != 0]
