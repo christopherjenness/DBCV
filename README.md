@@ -1,6 +1,6 @@
 # DBCV
-Python implementation of Density-Based Clustering Validation
-
+Efficient and scalable python implementation of Density-Based Clustering Validation. This is not the [original repo](https://github.com/christopherjenness/DBCV/) and it is forked from it to reimplement bottlenecks and make it run for more samples 
+in a feasible time.
 ## Source
 
 Moulavi, Davoud, et al. "Density-based clustering validation." Proceedings of the 2014 SIAM International Conference on Data Mining. Society for Industrial and Applied Mathematics, 2014.
@@ -67,6 +67,7 @@ That's pretty good.  To assess the quality of clustering, using Density-Based Cl
 
 ```python
 from scipy.spatial.distance import euclidean
+from dbcv import get_score
 
 kmeans_score = DBCV(X, kmeans_labels, dist_function=euclidean)
 hdbscan_score = DBCV(X, hdbscan_labels, dist_function=euclidean)

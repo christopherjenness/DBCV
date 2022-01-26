@@ -6,17 +6,15 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score
 from scipy.spatial.distance import euclidean
 
-
-
-np.random.seed(1)
+np.random.seed(5)
 
 
 def get_data():
-    noisy_points = np.random.rand(100, 2) - 0.5
+    noisy_points = np.random.rand(300, 2) - 0.5
     all_points = [noisy_points]
 
     n_clusters = 4
-    cluster_size = 50
+    cluster_size = 100
 
     for _ in range(n_clusters):
         cluster_center = np.random.rand(1, 2) - 0.5

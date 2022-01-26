@@ -1,22 +1,16 @@
 """
 Implimentation of Density-Based Clustering Validation "DBCV"
-
-Citation:
-Moulavi, Davoud, et al. "Density-based clustering validation."
-Proceedings of the 2014 SIAM International Conference on Data Mining.
-Society for Industrial and Applied Mathematics, 2014.
 """
 
 import numpy as np
-from scipy.spatial.distance import euclidean, cdist
+from scipy.spatial.distance import cdist
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse import csgraph
-from typing import List, Callable
 from tqdm import tqdm
 
 
 class DBCV:
-    def __init__(self, samples: np.ndarray, labels: np.ndarray, dist_function: Callable = euclidean):
+    def __init__(self, samples: np.ndarray, labels: np.ndarray, dist_function: str = 'euclidean', verbose=False):
         """
         Density Based clustering validation
 
@@ -31,6 +25,12 @@ class DBCV:
         self.labels = labels
         self.dist_function = dist_function
         self.cluster_lookup = {}
+        self.shortest_paths = None
+        self.verbose = verbose
+
+    def verbose_log(self, msg):
+        if self.verbose:
+            print(msg)
 
     def get_score(self):
         """
@@ -40,14 +40,16 @@ class DBCV:
             score in range[-1, 1] indicating validity of clustering assignments
         """
         graph = self._mutual_reach_dist_graph(self.samples, self.labels, self.dist_function)
-        print("made graph matrix")
+        self.verbose_log("made graph matrix")
         mst = self._mutual_reach_dist_MST(graph)
-        print("built MST")
+        self.verbose_log("built MST")
+        self.shortest_paths = csgraph.dijkstra(mst)
+        self.verbose_log("calculated shortest paths")
         cluster_validity = self._clustering_validity_index(mst, self.labels)
-        print("scores calculated")
+        self.verbose_log("scores calculated")
         return cluster_validity
 
-    def _core_dist(self, point, distance_vector):
+    def _core_dist(self, point: np.ndarray, distance_vector: np.ndarray):
         """
         Computes the core distance of a point.
         Core distance is the inverse density of an object.
@@ -55,10 +57,9 @@ class DBCV:
         Args:
             point (np.array): array of dimensions (n_features,)
                 point to compute core distance of
-            neighbors (np.ndarray): array of dimensions (n_neighbors, n_features):
-                array of all other points in object class
-            dist_dunction (func): function to determine distance between objects
-                func args must be [np.array, np.array] where each array is a point
+
+            distance_vector (np.array):
+                vector of distances from point to all other points in its cluster
 
         Returns: core_dist (float)
             inverse density of point
@@ -71,9 +72,9 @@ class DBCV:
         core_dist = (numerator / (n_neighbors - 1)) ** (-1 / n_features)
         return core_dist
 
-    def _calculate_pairwise_distance(self, samples: np.ndarray):
+    def _calculate_pairwise_distance(self, samples: np.ndarray, dist_function: str):
         # TODO: align the metric with distance function
-        return cdist(samples, samples, metric='euclidean')
+        return cdist(samples, samples, metric=dist_function)
 
     def _mutual_reach_dist_graph(self, X, labels, dist_function):
         """
@@ -94,7 +95,7 @@ class DBCV:
         """
         n_samples = np.shape(X)[0]
 
-        pairwise_distance = self._calculate_pairwise_distance(X)
+        pairwise_distance = self._calculate_pairwise_distance(X, dist_function)
         core_dists = []
 
         for idx in tqdm(range(n_samples)):
@@ -170,8 +171,8 @@ class DBCV:
         """
         indices_i = np.where(labels == cluster_i)[0]
         indices_j = np.where(labels == cluster_j)[0]
-        shortest_paths = csgraph.dijkstra(MST, indices=indices_i)
-        relevant_paths = shortest_paths[:, indices_j]
+
+        relevant_paths = self.shortest_paths[indices_i][:, indices_j]
         density_separation = np.min(relevant_paths)
         return density_separation
 
@@ -231,14 +232,11 @@ class DBCV:
         Helper function to get samples of a specified cluster.
 
         Args:
-            X (np.ndarray): ndarray with dimensions [n_samples, n_features]
-                data to check validity of clustering
             labels (np.array): clustering assignments for data X
             cluster (int): cluster of interest
 
         Returns: members (np.ndarray)
-            array of dimensions (n_samples, n_features) of samples of the
-            specified cluster.
+            array of dimensions (n_samples,) of indices of samples of cluster
         """
         if cluster in self.cluster_lookup:
             return self.cluster_lookup[cluster]
@@ -247,3 +245,8 @@ class DBCV:
 
         self.cluster_lookup[cluster] = indices
         return indices
+
+
+def get_score(samples: np.ndarray, labels: np.ndarray, dist_function: str = 'euclidean', verbose=False):
+    scorer = DBCV(samples, labels, dist_function, verbose=verbose)
+    return scorer.get_score()
