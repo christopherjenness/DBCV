@@ -5,7 +5,7 @@ from scipy.spatial.distance import euclidean
 import matplotlib.pyplot as plt
 
 
-def generate_data(n_samples=1000, noise=0.05):
+def generate_data(n_samples=10000, noise=0.05):
     noisy_moons = datasets.make_moons(n_samples=n_samples, noise=noise)
     X = noisy_moons[0]
     return X

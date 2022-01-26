@@ -103,7 +103,6 @@ class DBCV:
                 class_i = labels[row]
                 class_j = labels[col]
 
-                # TODO: use a lookup table for this method
                 members_i = self._get_label_member_indices(labels, class_i)
                 members_j = self._get_label_member_indices(labels, class_j)
 
@@ -114,7 +113,7 @@ class DBCV:
                     core_dist_map[row] = self._core_dist(point_i, distance_vector_i)
 
                 if col not in core_dist_map:
-                    core_dist_map[col] = self._core_dist(point_i, distance_vector_j)
+                    core_dist_map[col] = self._core_dist(point_j, distance_vector_j)
 
                 distance = pairwise_distance[row, col]
                 mutual_reachability_distance = np.max([core_dist_map[row], core_dist_map[col], distance])
