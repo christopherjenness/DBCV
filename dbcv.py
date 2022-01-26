@@ -12,6 +12,7 @@ from scipy.spatial.distance import euclidean, cdist
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse import csgraph
 from typing import List, Callable
+from tqdm import tqdm
 
 
 class DBCV:
@@ -39,8 +40,11 @@ class DBCV:
             score in range[-1, 1] indicating validity of clustering assignments
         """
         graph = self._mutual_reach_dist_graph(self.samples, self.labels, self.dist_function)
+        print("made graph matrix")
         mst = self._mutual_reach_dist_MST(graph)
+        print("built MST")
         cluster_validity = self._clustering_validity_index(mst, self.labels)
+        print("scores calculated")
         return cluster_validity
 
     def _core_dist(self, point, distance_vector):
@@ -89,39 +93,28 @@ class DBCV:
 
         """
         n_samples = np.shape(X)[0]
-        graph = []
-        counter = 0
 
         pairwise_distance = self._calculate_pairwise_distance(X)
-        core_dist_map = {}
+        core_dists = []
 
-        for row in range(n_samples):
-            graph_row = []
-            for col in range(n_samples):
-                point_i = X[row]
-                point_j = X[col]
-                class_i = labels[row]
-                class_j = labels[col]
+        for idx in tqdm(range(n_samples)):
+            class_label = labels[idx]
+            members = self._get_label_member_indices(labels, class_label)
+            distance_vector = pairwise_distance[idx, :][members]
+            core_dists.append(self._core_dist(X[idx], distance_vector))
 
-                members_i = self._get_label_member_indices(labels, class_i)
-                members_j = self._get_label_member_indices(labels, class_j)
+        # to do a bulk np.max we want to repeat core distances
+        core_dists = np.repeat(np.array(core_dists).reshape(-1, 1), n_samples, axis=1)
 
-                distance_vector_i = pairwise_distance[row, :][members_i]
-                distance_vector_j = pairwise_distance[col, :][members_j]
+        # this matrix and its inverse show core_dist in position i,j for point i and point j respectively
+        core_dists_i = core_dists[:, :, np.newaxis]
+        core_dists_j = core_dists.T[:, :, np.newaxis]
+        pairwise_distance = pairwise_distance[:, :, np.newaxis]
 
-                if row not in core_dist_map:
-                    core_dist_map[row] = self._core_dist(point_i, distance_vector_i)
+        # concatenate all distances to compare them all in numpy
+        mutual_reachability_distance_matrix = np.concatenate([core_dists_i, core_dists_j, pairwise_distance], axis=-1)
+        graph = np.max(mutual_reachability_distance_matrix, axis=-1)
 
-                if col not in core_dist_map:
-                    core_dist_map[col] = self._core_dist(point_j, distance_vector_j)
-
-                distance = pairwise_distance[row, col]
-                mutual_reachability_distance = np.max([core_dist_map[row], core_dist_map[col], distance])
-
-                graph_row.append(mutual_reachability_distance)
-            counter += 1
-            graph.append(graph_row)
-        graph = np.array(graph)
         return graph
 
     def _mutual_reach_dist_MST(self, dist_tree):
