@@ -69,8 +69,8 @@ That's pretty good.  To assess the quality of clustering, using Density-Based Cl
 from scipy.spatial.distance import euclidean
 from dbcv import get_score
 
-kmeans_score = DBCV(X, kmeans_labels, dist_function=euclidean)
-hdbscan_score = DBCV(X, hdbscan_labels, dist_function=euclidean)
+kmeans_score = get_score(X, kmeans_labels, dist_function='euclidean')
+hdbscan_score = get_score(X, hdbscan_labels, dist_function='euclidean')
 print(kmeans_score, hdbscan_score)
 ```
 
