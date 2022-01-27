@@ -1,6 +1,6 @@
 # DBCV
-Efficient and scalable python implementation of Density-Based Clustering Validation. This is not the [original repo](https://github.com/christopherjenness/DBCV/) and it is forked from it to reimplement bottlenecks and make it run for more samples 
-in a feasible time.
+Python implementation of Density-Based Clustering Validation
+
 ## Source
 
 Moulavi, Davoud, et al. "Density-based clustering validation." Proceedings of the 2014 SIAM International Conference on Data Mining. Society for Industrial and Applied Mathematics, 2014.
