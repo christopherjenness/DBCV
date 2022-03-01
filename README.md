@@ -9,7 +9,7 @@ Moulavi, Davoud, et al. "Density-based clustering validation." Proceedings of th
 
 ## What is DBCV
 
-How do you validate clustering assignmnets from unsupervised learning algorithms?  A common method is the [Silhoette Method](https://en.wikipedia.org/wiki/Silhouette_(clustering)), which provides an objective score between -1 and 1 on the quality of clustering.  The silhouette value measures how well an object is classified in its own cluster instead of neighboring clusters.  The silhouette (and most other popular methods) work very well on globular clusters, but can fail on non-glubular clusters such as:
+How do you validate clustering assignmnets from unsupervised learning algorithms?  A common method is the [Silhoette Method](https://en.wikipedia.org/wiki/Silhouette_(clustering)), which provides an objective score between -1 and 1 on the quality of clustering.  The silhouette value measures how well an object is classified in its own cluster instead of neighboring clusters.  The silhouette (and most other popular methods) work very well on globular clusters, but can fail on non-globular clusters such as:
 
 ![non-globular](http://hdbscan.readthedocs.io/en/latest/_images/advanced_hdbscan_5_1.png)
 
